@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1a5c2e">
+  <meta name="description" content="ESCUDO — Juego de cartas para construir autoestima, asertividad y defensa contra el bullying. Basado en Psicología Frecuencial de Moisés Beltrán.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ESCUDO">
+  <meta name="play-app-id" content="com.psicofrecuencia.escudo">
+  <meta name="store-title" content="ESCUDO - El Juego del Guerrero Interior">
+  <meta name="store-description" content="Juego de cartas educativo que enseña autoestima, asertividad y defensa contra el bullying a niños y adolescentes. Incluye frecuencias binaurales y ejercicios de Psicología Frecuencial.">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <title>ESCUDO — El Juego del Guerrero Interior</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- ========== SPLASH ========== -->
+  <div id="splash" class="screen active">
+    <div class="splash-content">
+      <div class="shield-icon">🛡️</div>
+      <h1 class="splash-title">ESCUDO</h1>
+      <p class="splash-subtitle">El Juego del Guerrero Interior</p>
+      <div class="splash-loader"><div class="splash-loader-bar"></div></div>
+    </div>
+  </div>
+
+  <!-- ========== HOME ========== -->
+  <div id="home" class="screen">
+    <div class="home-header">
+      <div class="shield-glow">🛡️</div>
+      <h1 class="home-title">ESCUDO</h1>
+      <p id="frase-del-dia" class="frase-dia"></p>
+    </div>
+    <nav class="home-menu">
+      <button class="menu-btn btn-jugar" onclick="App.showScreen('game-setup')">
+        <span class="menu-icon">⚔️</span>
+        <span class="menu-label">Jugar</span>
+      </button>
+      <button class="menu-btn btn-cartas" onclick="App.showScreen('cards')">
+        <span class="menu-icon">🃏</span>
+        <span class="menu-label">Mis Cartas</span>
+      </button>
+      <button class="menu-btn btn-desafio" onclick="App.showScreen('daily')">
+        <span class="menu-icon">📅</span>
+        <span class="menu-label">Desafío Diario</span>
+      </button>
+      <button class="menu-btn btn-bullying" onclick="App.showScreen('antibullying')">
+        <span class="menu-icon">🛑</span>
+        <span class="menu-label">Anti-Bullying</span>
+      </button>
+      <button class="menu-btn btn-frecuencia" onclick="App.showScreen('frecuencia')">
+        <span class="menu-icon">🎴</span>
+        <span class="menu-label">Frecuencias</span>
+      </button>
+      <button class="menu-btn btn-perfil" onclick="App.showScreen('profile')">
+        <span class="menu-icon">🏆</span>
+        <span class="menu-label">Perfil</span>
+      </button>
+      <button class="menu-btn btn-config" onclick="App.showScreen('settings')">
+        <span class="menu-icon">⚙️</span>
+        <span class="menu-label">Ajustes</span>
+      </button>
+    </nav>
+    <footer class="home-footer">psicofrecuencia.com</footer>
+  </div>
+
+  <!-- ========== GAME SETUP ========== -->
+  <div id="game-setup" class="screen">
+    <header class="screen-header">
+      <button class="back-btn" onclick="App.showScreen('home')">←</button>
+      <h2>Nueva Partida</h2>
+    </header>
+    <div class="setup-content">
+      <label class="setup-label">Número de jugadores</label>
+      <div class="player-select">
+        <button class="player-num active" data-n="2">2</button>
+        <button class="player-num" data-n="3">3</button>
+        <button class="player-num" data-n="4">4</button>
+        <button class="player-num" data-n="5">5</button>
+        <button class="player-num" data-n="6">6</button>
+      </div>
+      <div id="player-names" class="player-names"></div>
+      <label class="setup-label">Modo de edad</label>
+      <div class="mode-select">
+        <button class="mode-btn active" data-mode="explorador">🧒 8-10 Explorador</button>
+        <button class="mode-btn" data-mode="guerrero">🧑 11-13 Guerrero</button>
+        <button class="mode-btn" data-mode="maestro">🧑‍🎓 14+ Maestro</button>
+      </div>
+      <button class="big-btn btn-start-game" onclick="App.startGame()">⚔️ ¡Iniciar Partida!</button>
+    </div>
+  </div>
+
+  <!-- ========== GAME PLAY ========== -->
+  <div id="game-play" class="screen">
+    <header class="game-header">
+      <button class="back-btn" onclick="App.confirmExitGame()">←</button>
+      <h2 id="game-title">Partida</h2>
+      <span id="game-round" class="game-round">Ronda 1</span>
+    </header>
+    <div id="game-scoreboard" class="scoreboard"></div>
+    <div id="game-area" class="game-area">
+      <div id="current-player-indicator" class="current-player"></div>
+      <div id="card-display" class="card-display">
+        <div id="card-inner" class="card-inner card-back">
+          <div class="card-back-face">
+            <span class="card-back-icon">🛡️</span>
+            <span class="card-back-text">ESCUDO</span>
+          </div>
+          <div id="card-front-face" class="card-front-face"></div>
+        </div>
+      </div>
+      <div id="game-actions" class="game-actions">
+        <button id="btn-draw" class="big-btn" onclick="App.drawCard()">🃏 Robar Carta</button>
+      </div>
+      <div id="vote-area" class="vote-area hidden">
+        <p>¿El jugador cumplió el reto?</p>
+        <div class="vote-buttons">
+          <button class="vote-btn vote-yes" onclick="App.vote(true)">✅ Cumplió</button>
+          <button class="vote-btn vote-no" onclick="App.vote(false)">❌ No cumplió</button>
+        </div>
+      </div>
+      <div id="power-effect" class="power-effect hidden">
+        <p id="power-effect-text"></p>
+        <button class="big-btn" onclick="App.acceptPowerEffect()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== GAME END ========== -->
+  <div id="game-end" class="screen">
+    <div class="game-end-content">
+      <h2>🏆 ¡Fin de la Partida!</h2>
+      <div id="game-end-results" class="end-results"></div>
+      <button class="big-btn" onclick="App.showScreen('home')">🏠 Inicio</button>
+      <button class="big-btn btn-secondary" onclick="App.showScreen('game-setup')">🔄 Jugar de nuevo</button>
+    </div>
+  </div>
+
+  <!-- ========== CARDS BROWSER ========== -->
+  <div id="cards" class="screen">
+    <header class="screen-header">
+      <button class="back-btn" onclick="App.showScreen('home')">←</button>
+      <h2>Mis Cartas</h2>
+    </header>
+    <div class="cards-toolbar">
+      <input type="text" id="card-search" class="search-input" placeholder="🔍 Buscar carta..." oninput="App.filterCards()">
+      <div class="filter-chips">
+        <button class="chip active" data-filter="all" onclick="App.setCardFilter('all',this)">Todas</button>
+        <button class="chip chip-escudo" data-filter="escudo" onclick="App.setCardFilter('escudo',this)">🛡️ Escudo</button>
+        <button class="chip chip-espada" data-filter="espada" onclick="App.setCardFilter('espada',this)">⚔️ Espada</button>
+        <button class="chip chip-barrera" data-filter="barrera" onclick="App.setCardFilter('barrera',this)">🛑 Barrera</button>
+        <button class="chip chip-poder" data-filter="poder" onclick="App.setCardFilter('poder',this)">✨ Poder</button>
+        <button class="chip chip-frecuencia" data-filter="frecuencia" onclick="App.setCardFilter('frecuencia',this)">🎴 Frecuencia</button>
+        <button class="chip chip-fav" data-filter="fav" onclick="App.setCardFilter('fav',this)">❤️ Favoritas</button>
+      </div>
+    </div>
+    <div id="cards-list" class="cards-list"></div>
+  </div>
+
+  <!-- ========== CARD DETAIL ========== -->
+  <div id="card-detail" class="screen">
+    <header class="screen-header">
+      <button class="back-btn" onclick="App.showScreen('cards')">←</button>
+      <h2 id="detail-title">Carta</h2>
+      <button id="detail-fav-btn" class="fav-btn" onclick="App.toggleFav()">🤍</button>
+    </header>
+    <div id="card-detail-content" class="card-detail-content"></div>
+  </div>
+
+  <!-- ========== DAILY CHALLENGE ========== -->
+  <div id="daily" class="screen">
+    <header class="screen-header">
+      <button class="back-btn" onclick="App.showScreen('home')">←</button>
+      <h2>Desafío Diario</h2>
+    </header>
+    <div class="daily-content">
+      <div id="daily-card" class="daily-card"></div>
+      <div class="streak-section">
+        <h3>🔥 Racha de Días</h3>
+        <div id="streak-calendar" class="streak-calendar"></div>
+        <p id="streak-count" class="streak-count"></p>
+      </div>
+      <button class="big-btn" onclick="App.completeDailyChallenge()">✅ Completé el Reto de Hoy</button>
+    </div>
+  </div>
+
+  <!-- ========== ANTI-BULLYING ========== -->
+  <div id="antibullying" class="screen">
+    <header class="screen-header">
+      <button class="back-btn" onclick="App.showScreen('home')">←</button>
+      <h2>🛑 Anti-Bullying</h2>
+    </header>
+    <div class="antibullying-content">
+      <p class="section-desc">Practica cómo responder ante situaciones de bullying. Elige la mejor respuesta y aprende por qué funciona.</p>
+      <div id="ab-progress" class="ab-progress"></div>
+      <div id="ab-scenario" class="ab-scenario">
+        <h3 id="ab-title" class="ab-title"></h3>
+        <p id="ab-situation" class="ab-situation"></p>
+        <div id="ab-options" class="ab-options"></div>
+      </div>
+      <div id="ab-explanation" class="ab-explanation hidden">
+        <div id="ab-explanation-content"></div>
+        <button class="big-btn" onclick="App.nextABScenario()">Siguiente Escenario →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== FRECUENCIAS ========== -->
+  <div id="frecuencia" class="screen">
+    <header class="screen-header">
+      <button class="back-btn" onclick="App.showScreen('home')">←</button>
+      <h2>🎴 Frecuencias</h2>
+    </header>
+    <div class="frecuencia-content">
+      <p class="section-desc">Escucha frecuencias binaurales y realiza ejercicios de respiración guiados por el método de Psicología Frecuencial.</p>
+      <div class="freq-selector">
+        <button class="freq-btn" data-hz="396" onclick="App.selectFreq(396)">🔥 396Hz<br><small>Liberación</small></button>
+        <button class="freq-btn" data-hz="432" onclick="App.selectFreq(432)">🎶 432Hz<br><small>Armonía</small></button>
+        <button class="freq-btn" data-hz="528" onclick="App.selectFreq(528)">🎵 528Hz<br><small>Reparación</small></button>
+        <button class="freq-btn" data-hz="639" onclick="App.selectFreq(639)">💜 639Hz<br><small>Conexión</small></button>
+        <button class="freq-btn" data-hz="741" onclick="App.selectFreq(741)">⚡ 741Hz<br><small>Despertar</small></button>
+        <button class="freq-btn" data-hz="852" onclick="App.selectFreq(852)">🌟 852Hz<br><small>Intuición</small></button>
+      </div>
+      <div id="freq-player" class="freq-player hidden">
+        <div class="freq-playing-info">
+          <span id="freq-hz-display" class="freq-hz-big"></span>
+          <span id="freq-name-display" class="freq-name"></span>
+        </div>
+        <canvas id="freq-canvas" class="freq-canvas" width="300" height="120"></canvas>
+        <div class="freq-controls">
+          <button id="freq-play-btn" class="big-btn" onclick="App.toggleFreq()">▶️ Reproducir</button>
+          <button class="big-btn btn-secondary" onclick="App.stopFreq()">⏹ Detener</button>
+        </div>
+        <div class="freq-timer-section">
+          <label>Duration:</label>
+          <div class="timer-select">
+            <button class="timer-btn" data-min="5" onclick="App.setFreqTimer(5)">5 min</button>
+            <button class="timer-btn active" data-min="10" onclick="App.setFreqTimer(10)">10 min</button>
+            <button class="timer-btn" data-min="15" onclick="App.setFreqTimer(15)">15 min</button>
+          </div>
+          <div id="freq-timer-display" class="freq-timer-display">10:00</div>
+        </div>
+        <div id="breathing-guide" class="breathing-guide">
+          <div class="breathing-circle">
+            <span id="breath-text">Inhala</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== PROFILE ========== -->
+  <div id="profile" class="screen">
+    <header class="screen-header">
+      <button class="back-btn" onclick="App.showScreen('home')">←</button>
+      <h2>Perfil del Guerrero</h2>
+    </header>
+    <div class="profile-content">
+      <div class="profile-level">
+        <div id="profile-shield" class="profile-shield">🛡️</div>
+        <h3 id="profile-level-name">Novato</h3>
+        <div id="profile-level-bar" class="level-bar"><div class="level-fill"></div></div>
+        <p id="profile-level-info" class="level-info"></p>
+      </div>
+      <div class="profile-stats">
+        <div class="stat"><span class="stat-val" id="stat-games">0</span><span class="stat-lbl">Partidas</span></div>
+        <div class="stat"><span class="stat-val" id="stat-cards-won">0</span><span class="stat-lbl">Cartas ganadas</span></div>
+        <div class="stat"><span class="stat-val" id="stat-streak">0</span><span class="stat-lbl">Racha</span></div>
+        <div class="stat"><span class="stat-val" id="stat-scenarios">0</span><span class="stat-lbl">Escenarios</span></div>
+      </div>
+      <div class="achievements-section">
+        <h3>🎖️ Logros</h3>
+        <div id="achievements-list" class="achievements-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== SETTINGS ========== -->
+  <div id="settings" class="screen">
+    <header class="screen-header">
+      <button class="back-btn" onclick="App.showScreen('home')">←</button>
+      <h2>Ajustes</h2>
+    </header>
+    <div class="settings-content">
+      <div class="setting-row">
+        <span>🔊 Sonido</span>
+        <label class="toggle"><input type="checkbox" id="set-sound" checked onchange="App.saveSetting('sound',this.checked)"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <span>🔔 Notificaciones</span>
+        <label class="toggle"><input type="checkbox" id="set-notif" onchange="App.saveSetting('notif',this.checked)"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <span>🌙 Tema oscuro</span>
+        <label class="toggle"><input type="checkbox" id="set-dark" checked onchange="App.toggleTheme(this.checked)"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <span>🌐 Idioma</span>
+        <span class="setting-val">Español</span>
+      </div>
+      <div class="setting-section">
+        <h3>Acerca de</h3>
+        <p><strong>ESCUDO — El Juego del Guerrero Interior</strong></p>
+        <p>© 2026 Moisés Beltrán</p>
+        <p>Psicología Frecuencial</p>
+        <p><a href="https://psicofrecuencia.com" target="_blank" rel="noopener">psicofrecuencia.com</a></p>
+      </div>
+      <button class="big-btn btn-danger" onclick="App.resetAllData()">🗑️ Borrar todos los datos</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
